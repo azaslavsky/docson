@@ -1,6 +1,6 @@
 {
   "name": "docson",
-  "version": "1.0.2",
+  "version": "1.1.1",
   "description": "Documentation for your JSON types",
   "main": "docson.js",
   "directories": {
