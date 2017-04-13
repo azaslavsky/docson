@@ -29,6 +29,7 @@
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     padding-bottom: 10px;
+    margin: 12px 0 28px 0;
     -moz-box-shadow:    1px 1px 1px darkgray;
     -webkit-box-shadow: 1px 1px 1px darkgray;
     box-shadow:         1px 1px 1px darkgray;
@@ -110,52 +111,8 @@
     clear: both;
 }
 
-.docson .box-1 {
-    background: whitesmoke;/*
-    background: -webkit-linear-gradient(ghostwhite, whitesmoke, whitesmoke, gainsboro);
-    background: -moz-linear-gradient(ghostwhite, whitesmoke, whitesmoke, gainsboro);*/
-}
-
-.docson .box-2 {
-    background: beige;
-    background: -webkit-linear-gradient(white, beige, beige, gainsboro);
-    background: -moz-linear-gradient(white, beige, beige, gainsboro);
-}
-
-.docson .box-3 {
-    background: azure;
-    background: -webkit-linear-gradient(white, azure, azure, gainsboro);
-    background: -moz-linear-gradient(white, azure, azure, gainsboro);
-}
-
-.docson .box-4 {
-    background: mistyrose;
-    background: -webkit-linear-gradient(white, mistyrose, mistyrose, gainsboro);
-    background: -moz-linear-gradient(white, mistyrose, mistyrose, gainsboro);
-}
-
-.docson .box-5 {
-    background: #ddffee;
-    background: -webkit-linear-gradient(white, #ddffee, #ddffee, gainsboro);
-    background: -moz-linear-gradient(white, #ddffee, #ddffee, gainsboro);
-}
-
-.docson .box-6 {
-    background: ghostwhite;
-    background: -webkit-linear-gradient(white, ghostwhite, ghostwhite, gainsboro);
-    background: -moz-linear-gradient(white, ghostwhite, ghostwhite, gainsboro);
-}
-
-.docson .box-7 {
-    background: lavenderblush;
-    background: -webkit-linear-gradient(white, lavenderblush, lavenderblush, gainsboro);
-    background: -moz-linear-gradient(white, lavenderblush, lavenderblush, gainsboro);
-}
-
-.docson .box-8 {
-    background: aliceblue;
-    background: -webkit-linear-gradient(white, aliceblue, aliceblue, gainsboro);
-    background: -moz-linear-gradient(white, aliceblue, aliceblue, gainsboro);
+.docson .box-1, .docson .box-2, .docson .box-3, .docson .box-4, .docson .box-5, .docson .box-6, .docson .box-7, .docson .box-8 {
+    background: whitesmoke;
 }
 
 .docson .signature {
@@ -173,15 +130,42 @@
     float: left;
     font-family: "Lucida Console", Monaco, monospace;
     min-width: 130px;
+    position: relative;
+    padding-right: 40px;
+}
+
+.docson .property-name:after {
+    content: 'opt';
+    display: none;
+    text-decoration: none;
+    font-size: 10px;
+    position: absolute;
+    right: 0;
+    top: 1px;
+    background: azure;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0 4px;
+    color: #777;
 }
 
 .docson .required {
     font-weight: bold;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.docson .required:after {
+    content: 'req';
+    display: block;
+    background: bisque;
+    color: #111;
 }
 
 .docson .type-keyword {
     font-size: 80%;
     color: dimgray;
+    margin-right: 8px;
 }
 
 .docson .type-pattern {
@@ -206,6 +190,7 @@
     float: left;
     min-width: 160px;
     max-width: 320px;
+    line-height: 220%;
 }
 
 .docson .signature-type-any {
@@ -295,6 +280,7 @@
     padding-top: 4px;
     padding-left: 8px;
     display: none;
+    clear: both;
 }
 
 .docson .button {
@@ -328,6 +314,7 @@
 .docson .desc {
     padding-left: 6px;
     line-height: 17px;
+    clear: both;
 }
 
 .docson .desc p {
