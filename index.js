@@ -318,8 +318,123 @@ Handlebars.registerHelper('l', function(context) {
     console.log(context);
 });
 
+/* CUSTOM START */
+Handlebars.registerHelper('mini', function(val, options) {;
+    if(val) {
+        return options.fn(this);
+    }
+});
+
+Handlebars.registerHelper('container', function(schema, useResolved) {
+    if (useResolved && schema.__resolved) {
+        return new Handlebars.SafeString(containerTemplate(schema.__resolved));
+    } else {
+        return new Handlebars.SafeString(containerTemplate(schema));
+    }
+});
+
+var miniCount = 0;
+function miniSchema(obj) {
+    mini = {};
+    obj = obj || {};
+    mini.properties = obj.properties || {};
+    mini.required = obj.required || [];
+    mini.__mini = true;
+    mini.id = '__mini-' + (miniCount++);
+    return mini;
+};
+
+function merge(combined, adding) {
+    combined = miniSchema(combined);
+    adding = miniSchema(adding);
+
+    for (var i in adding.properties) {
+        combined.properties[i] = adding.properties[i];
+    }
+    adding.required.forEach(function(req) {
+        if (combined.required.indexOf(req) === -1) {
+            combined.required.push(req);
+        }
+    });
+
+    return combined;
+};
+
+function isMergeable(schema) {
+    return schema.type === 'object';
+}
+
+//Combine this schema with the resolved schemas for each of its "allOf" children
+function resolve(schema) {
+    if (schema.__resolved) {
+        return;
+    } else if (schema.$ref) {
+        resolve(resolveRef(schema.$ref));
+        return;
+    } else {
+        var resolved = miniSchema();
+        (schema.allOf || []).forEach(function(subSchema) {
+            subSchema = subSchema.$ref ? resolveRef(subSchema.$ref) : subSchema;
+            if (isMergeable(subSchema)) {
+                resolved = merge(resolved, subSchema.__resolved || {});
+            }
+        });
+
+        if (isMergeable(schema)) {
+            resolved = merge(resolved, schema);
+        }
+
+        //Swap out the original values for new ones, but keep them stored just in case we need them
+        schema.__original = {
+            properties: schema.properties,
+            required: schema.required
+        };
+        schema.properties = resolved.properties;
+        schema.required = resolved.required;
+        schema.allOf = undefined;
+        schema.__resolved = resolved;
+    }
+};
+
+function walk(schema) {
+    if (schema.__resolved) {
+        return schema;
+    } else if (schema.$ref) {
+        walk(resolveRef(schema.$ref));
+        return schema;
+    } else if (isMergeable(schema)) {
+        //Iterate through all schema-combining arrays
+        ['allOf', 'anyOf', 'oneOf', 'not'].forEach(function(combiner) {
+            (schema[combiner] || []).forEach(function(sub) {
+                walk(sub);
+            });
+        });
+
+        //Iterate through the properties object, resolving any child schemas
+        Object.keys(schema.properties || {}).forEach(function(key) {
+            walk(schema.properties[key]);
+        });
+
+        //Make our own resolution
+        resolve(schema);
+    }
+    return schema;
+};
+
+function prerender(schema) {
+    var walked;
+    stack.push(schema);
+    walked = walk(schema);
+    console.log('Pre-processed schema: ');
+    console.log(walked);
+    stack.pop();
+    return walked;
+}
+/* CUSTOM END */
+
 function init() {
     boxTemplate=Handlebars.compile(fs.readFileSync(__dirname+"/templates/box.html","utf8"));
+    containerTemplate=Handlebars.compile(fs.readFileSync(__dirname+"/templates/container.html","utf8"));
     signatureTemplate=Handlebars.compile(fs.readFileSync(__dirname+"/templates/signature.html","utf8"));
     ready.resolve();
 }
@@ -351,6 +466,7 @@ docson.doc = function(element, schema, ref, baseUrl) {
             }
             target.root = true;
             target.__ref = "<root>";
+            prerender(target);
             var html = boxTemplate(target);
 
             if(ref) {
