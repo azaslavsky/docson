@@ -516,6 +516,15 @@ docson.doc = function(element, schema, ref, baseUrl) {
                    }
                }
             });
+            element.find(".box").mousedown(function(e) {
+                $('.box-selected').removeClass('box-selected');
+                $(this).addClass('box-selected');
+                e.preventDefault();
+                return false;
+            });
+            element.find("body").mousedown(function() {
+                $('.box-selected').removeClass('box-selected');
+            });
             element.find(".box").mouseenter(function() {
                 $(this).children(".source-button").fadeIn(300);
                 $(this).children(".box-body").children(".expand-button").fadeIn(300);
