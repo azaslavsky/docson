@@ -165,7 +165,7 @@ var withType = function(schema, options, hideAny) {
 }
 
 Handlebars.registerHelper('complex', function(schema, options) {
-    if(!simpleSchema(schema) && !schema.$ref || schema.properties) {
+    if(!simpleSchema(schema) && !schema.$ref && !schema.__blank || schema.properties) {
         return withType(schema, options);
     }
 });
@@ -319,6 +319,12 @@ Handlebars.registerHelper('l', function(context) {
 });
 
 /* CUSTOM START */
+Handlebars.registerHelper('pill', function(schema, options) {;
+    if(schema.__blank && schema.title) {
+        return options.fn(this);
+    }
+});
+
 Handlebars.registerHelper('mini', function(val, options) {;
     if(val) {
         return options.fn(this);
@@ -373,12 +379,23 @@ function resolve(schema) {
         return;
     } else {
         var resolved = miniSchema();
-        (schema.allOf || []).forEach(function(subSchema) {
-            subSchema = subSchema.$ref ? resolveRef(subSchema.$ref) : subSchema;
-            if (isMergeable(subSchema)) {
-                resolved = merge(resolved, subSchema.__resolved || {});
-            }
-        });
+        var allOf = (schema.allOf || [])
+            .map(function(subSchema) {
+                var schemaObj = subSchema.$ref ? resolveRef(subSchema.$ref) : subSchema;
+                if (isMergeable(schemaObj)) {
+                    resolved = merge(resolved, schemaObj.__resolved || {});
+                }
+                if (subSchema.$ref) {
+                    return {
+                        __blank: true,
+                        type: "object",
+                        title: schemaObj.title
+                    };
+                }
+            })
+            .filter(function(val) {
+                return !!val;
+            });
 
         if (isMergeable(schema)) {
             resolved = merge(resolved, schema);
@@ -386,12 +403,13 @@ function resolve(schema) {
 
         //Swap out the original values for new ones, but keep them stored just in case we need them
         schema.__original = {
+            allOf: schema.allOf,
             properties: schema.properties,
             required: schema.required
         };
         schema.properties = resolved.properties;
         schema.required = resolved.required;
-        schema.allOf = undefined;
+        schema.allOf = allOf.length ? allOf : undefined;
         schema.__resolved = resolved;
     }
 };

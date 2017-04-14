@@ -31,6 +31,9 @@
                 <span boxid="{{boxId}}" class="box-{{boxId}} signature-type-{{__type}} signature-button signature-type-expandable button">{{__type}}</span>
             {{/box}}
         {{/complex}}
+        {{#pill this}}
+           <span class="signature-type-{{title}} signature-type-ref signature-button signature-pill">{{title}}</span>
+        {{/pill}}
         {{#ref this}}
             {{#box this}}
                 <span boxid="{{boxId}}" class="box-{{boxId}} signature-type-ref signature-button signature-type-expandable button">{{__name}}</span>

@@ -280,6 +280,12 @@
     clear: both;
 }
 
+.docson .signature-button.signature-pill {
+    cursor: default;
+    color: #999;
+    background: azure;
+}
+
 .docson .box-container {
     float: left;
     padding-top: 4px;
